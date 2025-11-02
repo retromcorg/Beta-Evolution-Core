@@ -12,9 +12,7 @@ public class EvolutionCore extends JavaPlugin {
     private EvolutionCore plugin;
     private Logger log;
     private PluginDescriptionFile pdf;
-    //Poseidon
-    private boolean poseidonPresent = false;
-    //Authentication Server List
+
 
     @Override
     public void onEnable() {
@@ -23,13 +21,6 @@ public class EvolutionCore extends JavaPlugin {
         logInfo("Enabling Plugin");
         plugin = this;
 
-        if (testClassExistence("com.projectposeidon.api.PoseidonUUID")) {
-            poseidonPresent = true;
-            logInfo("Project Poseidon support enabled.");
-        } else {
-            logInfo("Project Poseidon support disabled.");
-        }
-
         EvolutionCache.getInstance(plugin).setPlugin(plugin);
 
         final EvolutionPlayerListener EPL = new EvolutionPlayerListener(plugin);
@@ -37,16 +28,6 @@ public class EvolutionCore extends JavaPlugin {
         getServer().getPluginManager().registerEvent(org.bukkit.event.Event.Type.PLAYER_JOIN, EPL, Event.Priority.Highest, plugin);
 
         logInfo("Plugin Enabled");
-    }
-
-
-    private boolean testClassExistence(String className) {
-        try {
-            Class.forName(className);
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
     }
 
     @Override
@@ -59,10 +40,6 @@ public class EvolutionCore extends JavaPlugin {
         if (log != null) {
             log.info("[" + pdf.getName() + "] " + s);
         }
-    }
-
-    public boolean isPoseidonPresent() {
-        return poseidonPresent;
     }
 
 }

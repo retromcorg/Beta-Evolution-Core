@@ -10,6 +10,4 @@ public class EvolutionAPI {
         return false;
 
     }
-
-
 }

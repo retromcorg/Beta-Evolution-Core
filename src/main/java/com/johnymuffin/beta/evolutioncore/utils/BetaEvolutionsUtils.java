@@ -1,8 +1,6 @@
-package com.johnymuffin.beta.evolutioncore;
+package com.johnymuffin.beta.evolutioncore.utils;
 
-import com.johnymuffin.beta.evolutioncore.libs.json.JSONException;
-import com.johnymuffin.beta.evolutioncore.libs.json.JSONObject;
-
+import com.google.gson.JsonObject;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -107,6 +105,7 @@ public class BetaEvolutionsUtils {
             }
         }
         return verificationResults;
+
     }
 
 
@@ -122,7 +121,7 @@ public class BetaEvolutionsUtils {
         if (beVersion == BEVersion.V1) {
             //Stage 1 - Contact node to confirm identification
             String stage1URL = node + "/serverAuth.php?method=1&username=" + encodeString(username) + "&userip=" + encodeString(userIP);
-            JSONObject stage1Object = getJSONFromURL(stage1URL);
+            JsonObject stage1Object = getJSONFromURL(stage1URL);
             if (stage1Object == null) {
                 log("Authentication with node: " + node + " has failed to respond when queried.");
                 return null;
@@ -131,11 +130,11 @@ public class BetaEvolutionsUtils {
                 log("Malformed response from: " + node + " using version " + beVersion);
                 return null;
             }
-            return stage1Object.getBoolean("verified");
+            return stage1Object.get("verified").getAsBoolean();
         } else if (beVersion == BEVersion.V2_PLAINTEXT) {
             //Stage 1 - Contact node to confirm identification
             String stage1URL = node + "/server/getVerification?username=" + encodeString(username) + "&userip=" + encodeString(userIP);
-            JSONObject stage1Object = getJSONFromURL(stage1URL);
+            JsonObject stage1Object = getJSONFromURL(stage1URL);
             if (stage1Object == null) {
                 log("Authentication with node: " + node + " has failed to respond when queried.");
                 return null;
@@ -144,7 +143,7 @@ public class BetaEvolutionsUtils {
                 log("Malformed response from: " + node + " using version " + beVersion);
                 return null;
             }
-            return stage1Object.getBoolean("verified");
+            return stage1Object.get("verified").getAsBoolean();
         }
 
         return null;
@@ -183,7 +182,7 @@ public class BetaEvolutionsUtils {
         if (beVersion == BEVersion.V1) {
             //State 1 - Contact the node with username and method type
             String stage1URL = node + "/userAuth.php?method=1&username=" + encodeString(username);
-            JSONObject stage1Object = getJSONFromURL(stage1URL);
+            JsonObject stage1Object = getJSONFromURL(stage1URL);
             if (stage1Object == null) {
                 log("Authentication with node: " + node + " has failed as JSON can't be fetched.");
                 return null;
@@ -192,7 +191,7 @@ public class BetaEvolutionsUtils {
                 log("Malformed response from: " + node + " using version " + beVersion);
                 return null;
             }
-            String serverID = stage1Object.getString("serverId");
+            String serverID = stage1Object.get("serverId").getAsString();
             //Stage 2 - Contact Mojang to authenticate
             Boolean mojangAuthentication = authenticateWithMojang(username, sessionToken, serverID);
             if (mojangAuthentication == null) {
@@ -204,7 +203,7 @@ public class BetaEvolutionsUtils {
             }
             //Stage 3 - Contact node to confirm auth
             String stage3URL = node + "/userAuth.php?method=2&username=" + encodeString(username) + "&serverId=" + encodeString(serverID);
-            JSONObject stage3Object = getJSONFromURL(stage3URL);
+            JsonObject stage3Object = getJSONFromURL(stage3URL);
             if (stage3Object == null) {
                 log("Authentication with node: " + node + " has failed as JSON can't be fetched.");
                 return null;
@@ -213,13 +212,13 @@ public class BetaEvolutionsUtils {
                 log("Malformed response from: " + node + " using version " + beVersion);
                 return null;
             }
-            return stage3Object.getBoolean("result");
+            return stage3Object.get("result").getAsBoolean();
 
 
         } else if (beVersion == BEVersion.V2_PLAINTEXT) {
             //State 1 - Contact the node with username and method type
             String stage1URL = node + "/user/getServerID?username=" + encodeString(username) + "&userip=" + ip;
-            JSONObject stage1Object = getJSONFromURL(stage1URL);
+            JsonObject stage1Object = getJSONFromURL(stage1URL);
             if (stage1Object == null) {
                 log("Authentication with node: " + node + " has failed as JSON can't be fetched.");
                 return null;
@@ -228,7 +227,7 @@ public class BetaEvolutionsUtils {
                 log("Malformed response from: " + node + " using version " + beVersion);
                 return null;
             }
-            String serverID = stage1Object.getString("serverID");
+            String serverID = stage1Object.get("serverID").getAsString();
             //Stage 2 - Contact Mojang to authenticate
             Boolean mojangAuthentication = authenticateWithMojang(username, sessionToken, serverID);
             if (mojangAuthentication == null) {
@@ -240,7 +239,7 @@ public class BetaEvolutionsUtils {
             }
             //Stage 3 - Contact node to confirm auth
             String stage3URL = node + "/user/successfulAuth?username=" + encodeString(username) + "&serverid=" + encodeString(serverID) + "&userip=" + encodeString(ip);
-            JSONObject stage3Object = getJSONFromURL(stage3URL);
+            JsonObject stage3Object = getJSONFromURL(stage3URL);
             if (stage3Object == null) {
                 log("Authentication with node: " + node + " has failed as JSON can't be fetched.");
                 return null;
@@ -249,7 +248,7 @@ public class BetaEvolutionsUtils {
                 log("Malformed response from: " + node + " using version " + beVersion);
                 return null;
             }
-            return stage3Object.getBoolean("result");
+            return stage3Object.get("result").getAsBoolean();
         }
         return null;
     }
@@ -306,7 +305,7 @@ public class BetaEvolutionsUtils {
 //        beServers.put("https://auth.johnymuffin.com", BEVersion.V1);
         beServers.put("https://auth1.evolutions.johnymuffin.com", BEVersion.V2_PLAINTEXT);
         beServers.put("https://auth2.evolutions.johnymuffin.com", BEVersion.V2_PLAINTEXT);
-        beServers.put("https://auth3.evolutions.johnymuffin.com", BEVersion.V2_PLAINTEXT);
+//        beServers.put("https://auth3.evolutions.johnymuffin.com", BEVersion.V2_PLAINTEXT);
     }
 
     public enum BEVersion {
@@ -321,7 +320,7 @@ public class BetaEvolutionsUtils {
     //Method readJsonFromUrl and readAll licensed under CC BY-SA 2.5 (https://stackoverflow.com/help/licensing)
     //Credit: https://stackoverflow.com/a/4308662
 
-    private static JSONObject readJsonFromUrl(String url) throws IOException, JSONException {
+    private static JsonObject readJsonFromUrl(String url) throws IOException{
 //        InputStream is = (new URL(url)).openStream();
 //
 //        try {
@@ -336,7 +335,7 @@ public class BetaEvolutionsUtils {
     }
 
     //Read JSON from URL with timeout
-    private static JSONObject readJsonFromUrlWithTimeout(String url, int timeout) throws IOException, JSONException {
+    private static JsonObject readJsonFromUrlWithTimeout(String url, int timeout) throws IOException {
         URL myURL = new URL(url);
         HttpURLConnection connection = (HttpURLConnection) myURL.openConnection();
         connection.setConnectTimeout(timeout);
@@ -347,7 +346,7 @@ public class BetaEvolutionsUtils {
         try {
             BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
             String jsonText = readAll(rd);
-            JSONObject json = new JSONObject(jsonText);
+            JsonObject json = new com.google.gson.JsonParser().parse(jsonText).getAsJsonObject();
             return json;
         } finally {
             is.close();
@@ -363,9 +362,9 @@ public class BetaEvolutionsUtils {
     }
 
 
-    private JSONObject getJSONFromURL(String url) {
+    private JsonObject getJSONFromURL(String url) {
         try {
-            JSONObject jsonObject = readJsonFromUrl(url);
+            JsonObject jsonObject = readJsonFromUrl(url);
             return jsonObject;
         } catch (Exception e) {
             if (debug) {
@@ -394,7 +393,7 @@ public class BetaEvolutionsUtils {
     }
 
 
-    private boolean verifyJSONArguments(JSONObject jsonObject, String... arguments) {
+    private boolean verifyJSONArguments(JsonObject jsonObject, String... arguments) {
         for (String s : arguments) {
             if (!jsonObject.has(s)) return false;
         }
