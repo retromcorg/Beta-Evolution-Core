@@ -5,7 +5,6 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class EvolutionCache {
     private static EvolutionCache singleton;
@@ -19,7 +18,7 @@ public class EvolutionCache {
         this.plugin = plugin;
     }
 
-    public boolean isPlayerCached(String username, String ip) {
+    public synchronized boolean isPlayerCached(String username, String ip) {
         for (String key : cacheMap.keySet()) {
             if (cacheMap.get(key).get("username").equals(username)) {
                 //Same User
@@ -35,7 +34,7 @@ public class EvolutionCache {
     }
 
 
-    public Integer deleteOldCache() {
+    public synchronized Integer deleteOldCache() {
         int deletedCaches = 0;
         long unixTime = System.currentTimeMillis() / 1000L;
 
@@ -65,7 +64,7 @@ public class EvolutionCache {
     }
 
 
-    public void addPlayerAuthentication(String username, String ip) {
+    public synchronized void addPlayerAuthentication(String username, String ip) {
         cacheNumber = cacheNumber + 1;
         final HashMap<String, String> tmp = new HashMap<String, String>();
         tmp.put("username", username);

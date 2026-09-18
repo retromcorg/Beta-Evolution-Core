@@ -12,13 +12,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
-      - name: Set up JDK 1.8
-        uses: actions/setup-java@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v6
         with:
           distribution: 'temurin'
-          java-version: 8
+          java-version: 25
 
       - name: Get the version from pom.xml
         id: get_version
@@ -36,7 +36,7 @@ jobs:
 
       - name: Create GitHub Release
         if: ${{ !endsWith(env.PROJECT_VERSION, '-SNAPSHOT') }}
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ env.PROJECT_VERSION }}
           files: |

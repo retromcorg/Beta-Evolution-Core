@@ -1,4 +1,4 @@
 name: ${project.name}
 description: Provides Methods and Events for the Beta Evolution API
-version: ${project.description}
+version: ${project.version}
 main: com.johnymuffin.beta.evolutioncore.EvolutionCore

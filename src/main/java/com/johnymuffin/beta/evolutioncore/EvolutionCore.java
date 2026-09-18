@@ -23,9 +23,8 @@ public class EvolutionCore extends JavaPlugin {
 
         EvolutionCache.getInstance(plugin).setPlugin(plugin);
 
-        final EvolutionPlayerListener EPL = new EvolutionPlayerListener(plugin);
-        getServer().getPluginManager().registerEvent(Event.Type.PLAYER_PRELOGIN, EPL, Event.Priority.High, plugin);
-        getServer().getPluginManager().registerEvent(org.bukkit.event.Event.Type.PLAYER_JOIN, EPL, Event.Priority.Highest, plugin);
+        final EvolutionPlayerListener epl = new EvolutionPlayerListener(plugin);
+        getServer().getPluginManager().registerEvents(epl, this);
 
         logInfo("Plugin Enabled");
     }
